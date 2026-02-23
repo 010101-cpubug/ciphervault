@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description"
+        content="Securely encrypt and decrypt text messages using AES-256 encryption. Share encrypted messages safely with anyone.">
+    <meta name="theme-color" content="#0a0a14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>CipherVault</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Ambient background effects -->
+    <div class="bg-glow bg-glow--1"></div>
+    <div class="bg-glow bg-glow--2"></div>
+    <div class="bg-glow bg-glow--3"></div>
+
+    <main class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo__icon">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="2" width="36" height="36" rx="8" stroke="url(#logoGrad)" stroke-width="2.5" />
+                        <path d="M20 10L20 18M20 22L20 30M14 14L26 14M14 26L26 26" stroke="url(#logoGrad)"
+                            stroke-width="2" stroke-linecap="round" />
+                        <circle cx="20" cy="20" r="3" fill="url(#logoGrad)" />
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
+                                <stop stop-color="#6366f1" />
+                                <stop offset="1" stop-color="#a855f7" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 class="logo__text">CipherVault</h1>
+            </div>
+            <p class="header__tagline">End-to-end AES-256 encryption in your browser</p>
+        </header>
+
+        <!-- Session Badge -->
+        <div class="session-badge" id="session-badge" title="Unique device session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+            <span id="session-id-display">Session: ...</span>
+            <button class="session-badge__new" id="new-session-btn" type="button" title="Start new session">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mode Switcher -->
+        <div class="mode-switcher" role="tablist">
+            <button class="mode-btn mode-btn--active" id="btn-encrypt" role="tab" aria-selected="true"
+                data-mode="encrypt">
+                <svg class="mode-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span>Encrypt</span>
+            </button>
+            <button class="mode-btn" id="btn-decrypt" role="tab" aria-selected="false" data-mode="decrypt">
+                <svg class="mode-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                </svg>
+                <span>Decrypt</span>
+            </button>
+            <div class="mode-slider" id="mode-slider"></div>
+        </div>
+
+        <!-- Card -->
+        <section class="card" id="app-card">
+            <!-- Secret Key -->
+            <div class="field">
+                <label class="field__label" for="secret-key">
+                    <svg class="field__label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                    </svg>
+                    Secret Key
+                </label>
+                <div class="field__input-wrap">
+                    <input type="password" id="secret-key" class="field__input" placeholder="Enter a shared secret key…"
+                        autocomplete="off" spellcheck="false">
+                    <button class="field__toggle" id="toggle-key" type="button" aria-label="Toggle key visibility">
+                        <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                            <path
+                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                            <line x1="1" y1="1" x2="23" y2="23" />
+                        </svg>
+                    </button>
+                </div>
+                <p class="field__hint">Both sender and recipient must use the same key</p>
+            </div>
+
+            <!-- Input Text -->
+            <div class="field">
+                <label class="field__label" for="input-text" id="input-label">
+                    <svg class="field__label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    <span id="input-label-text">Plain Text Message</span>
+                </label>
+                <textarea id="input-text" class="field__textarea" placeholder="Type your secret message here…" rows="5"
+                    spellcheck="false"></textarea>
+                <div class="field__counter"><span id="char-count">0</span> characters</div>
+            </div>
+
+            <!-- Action Button -->
+            <button class="action-btn" id="action-btn" type="button">
+                <svg class="action-btn__icon action-btn__icon--encrypt" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <svg class="action-btn__icon action-btn__icon--decrypt" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="display:none">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                </svg>
+                <span id="action-btn-text">Encrypt Message</span>
+                <div class="action-btn__loader" id="action-loader"></div>
+            </button>
+
+            <!-- Output -->
+            <div class="field" id="output-field" style="display:none">
+                <label class="field__label" for="output-text" id="output-label">
+                    <svg class="field__label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="4 17 10 11 4 5" />
+                        <line x1="12" y1="19" x2="20" y2="19" />
+                    </svg>
+                    <span id="output-label-text">Encrypted Output</span>
+                </label>
+                <textarea id="output-text" class="field__textarea field__textarea--output" rows="5" readonly
+                    spellcheck="false"></textarea>
+                <div class="output-actions">
+                    <button class="copy-btn" id="copy-btn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        <span id="copy-btn-text">Copy to Clipboard</span>
+                    </button>
+                    <button class="clear-btn" id="clear-btn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                        <span>Clear All</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Session History -->
+            <div class="history" id="history-section" style="display:none">
+                <div class="history__header">
+                    <h3 class="history__title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        Session History
+                    </h3>
+                    <button class="history__clear" id="clear-history-btn" type="button" title="Clear history">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                    </button>
+                </div>
+                <ul class="history__list" id="history-list"></ul>
+            </div>
+        </section>
+
+        <!-- Info Section -->
+        <section class="info">
+            <div class="info__card">
+                <div class="info__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+                <div class="info__content">
+                    <h3>AES-256 GCM</h3>
+                    <p>Military-grade encryption with authenticated encryption mode</p>
+                </div>
+            </div>
+            <div class="info__card">
+                <div class="info__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                        <line x1="6" y1="6" x2="6.01" y2="6" />
+                        <line x1="6" y1="18" x2="6.01" y2="18" />
+                    </svg>
+                </div>
+                <div class="info__content">
+                    <h3>Client-Side Only</h3>
+                    <p>All processing happens in your browser — nothing is sent to any server</p>
+                </div>
+            </div>
+            <div class="info__card">
+                <div class="info__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                    </svg>
+                </div>
+                <div class="info__content">
+                    <h3>Zero Knowledge</h3>
+                    <p>We never see your keys, messages, or encrypted data</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 CipherVault &middot; Built with the Web Crypto API</p>
+        </footer>
+    </main>
+
+    <!-- Status Toast -->
+    <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
